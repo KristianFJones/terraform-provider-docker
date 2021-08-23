@@ -30,6 +30,13 @@ func resourceDockerConfig() *schema.Resource {
 				ForceNew:    true,
 			},
 
+			"templatedriver": {
+				Type:        schema.TypeString,
+				Description: "User-defined docker template driver of the config",
+				Required:    false,
+				ForceNew:    true,
+			},
+
 			"data": {
 				Type:             schema.TypeString,
 				Description:      "Base64-url-safe-encoded config data",
@@ -49,6 +56,7 @@ func resourceDockerConfigCreate(ctx context.Context, d *schema.ResourceData, met
 		Annotations: swarm.Annotations{
 			Name: d.Get("name").(string),
 		},
+		Templating: d.Get("templatedriver"),
 		Data: data,
 	}
 
@@ -76,6 +84,7 @@ func resourceDockerConfigRead(ctx context.Context, d *schema.ResourceData, meta 
 	d.SetId(config.ID)
 	d.Set("name", config.Spec.Name)
 	d.Set("data", base64.StdEncoding.EncodeToString(config.Spec.Data))
+	d.Set("templatedriver", config.Spec.Templating)
 	return nil
 }
 
